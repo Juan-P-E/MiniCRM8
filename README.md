@@ -53,7 +53,8 @@ Git & GitHub (control de versiones)
 
 Clonar el repositorio:
 
-git clone https://github.com/TU-USUARIO/MiniCRM.git
+git clone git clone https://github.com/Juan-P-E/MiniCRM8.git
+
 
 
 Entrar al directorio:
