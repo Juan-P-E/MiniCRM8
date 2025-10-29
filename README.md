@@ -110,5 +110,5 @@ Agregar exportación a CSV.
 
 Preparar versión con interfaz gráfica (WinForms o MAUI) como evolución del proyecto.
 
-👉 Repo creado como práctica de nivel trainee con orientación a CRM Dynamics 365 / Power Platform.
-Este MiniCRM es la base para seguir aprendiendo y mostrar mi progreso en proyectos reales.
+Repositorio creado como práctica de nivel trainee con orientación a CRM Dynamics 365 / Power Platform.  
+Este MiniCRM es la base para seguir aprendiendo y demostrar mi progreso en proyectos reales.

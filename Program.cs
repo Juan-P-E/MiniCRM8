@@ -5,6 +5,8 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 
+
+
 namespace MiniCRM
 {
     class Program
@@ -17,8 +19,26 @@ namespace MiniCRM
         static void Main(string[] args)
         {
             Console.OutputEncoding = System.Text.Encoding.UTF8;
+
+            // 1️⃣ Crear base si no existe
+            ConexionSQL.ProbarConexion();
+
+            // 2️⃣ Insertar 2 registros de prueba (solo una vez)
+            var cliente1 = new Cliente { Nombre = "Juan Test", Email = "juan@test.com", Telefono = "123456" };
+            var cliente2 = new Cliente { Nombre = "Mariana Sassone", Email = "mariana@test.com", Telefono = "789012" };
+            ConexionSQL.GuardarClienteEnSQL(cliente1);
+            ConexionSQL.GuardarClienteEnSQL(cliente2);
+
+            // 3️⃣ Mostrar lo que hay en la base
+            ConexionSQL.ListarClientesSQL();
+
+            Console.WriteLine("\n↩️  Enter para ir al menú…");
+            Console.ReadLine();
+
+            // 4️⃣ Cargar los clientes del JSON (para que funcione el menú antiguo)
             CargarClientes();
 
+            // 5️⃣ Entrar al menú
             while (true)
             {
                 MostrarMenu();
@@ -46,6 +66,55 @@ namespace MiniCRM
                 Console.ReadLine();
             }
         }
+
+        static void AgregarCliente_SQL()
+        {
+            Console.Write("\nNombre: ");
+            var nombre = (Console.ReadLine() ?? "").Trim();
+
+            Console.Write("Email: ");
+            var email = (Console.ReadLine() ?? "").Trim().ToLower();
+
+            Console.Write("Teléfono (opcional): ");
+            var tel = (Console.ReadLine() ?? "").Trim();
+
+            if (string.IsNullOrWhiteSpace(nombre) || string.IsNullOrWhiteSpace(email))
+            {
+                Console.WriteLine("⚠️  Nombre y Email son obligatorios.");
+                return;
+            }
+
+            try
+            {
+                Cliente nuevoCliente = new Cliente
+                {
+                    Nombre = nombre,
+                    Email = email,
+                    Telefono = tel
+                };
+               
+                ConexionSQL.GuardarClienteEnSQL(nuevoCliente);
+
+                
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("❌ Error al guardar en SQLite: " + ex.Message);
+            }
+        }
+
+        static void ListarClientes_SQL()
+        {
+            try
+            {
+                ConexionSQL.ListarClientesSQL();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("❌ Error al listar desde SQLite: " + ex.Message);
+            }
+        }
+
 
         // ====== Menú ======
         static void MostrarMenu()
@@ -124,6 +193,7 @@ namespace MiniCRM
                     continue;
                 }
                 break;
+                 
             }
 
             // Teléfono opcional
@@ -141,6 +211,8 @@ namespace MiniCRM
             var cli = new Cliente(nuevoId, nombre.Trim(), email, telefono);
             clientes.Add(cli);
             GuardarClientes();
+
+            AgregarCliente_SQL();
 
             Console.WriteLine("✓ Cliente agregado con éxito.");
         }
