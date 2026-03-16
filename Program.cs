@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 
 
-
+// Update 2026 - SQLite persistence improvements
 namespace MiniCRM
 {
     class Program

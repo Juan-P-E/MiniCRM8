@@ -1,7 +1,7 @@
 ﻿using MiniCRM;
 using System;
 using System.Data.SQLite;
-
+// Update 2026 - connection handling improvements
 public static class ConexionSQL
 {
     private const string ConnStr = "Data Source=clientes.db;Version=3;";

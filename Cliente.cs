@@ -20,3 +20,4 @@ namespace MiniCRM
         }
     }
 }
+// Update 2026 - client model adjustments
