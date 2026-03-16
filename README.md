@@ -112,3 +112,6 @@ Preparar versión con interfaz gráfica (WinForms o MAUI) como evolución del pr
 
 Repositorio creado como práctica de nivel trainee con orientación a CRM Dynamics 365 / Power Platform.  
 Este MiniCRM es la base para seguir aprendiendo y demostrar mi progreso en proyectos reales.
+
+Actualización marzo 2026:
+Se agregó persistencia con SQLite y validación de email duplicado.
