@@ -18,6 +18,7 @@ namespace MiniCRM
         // ====== Main ======
         static void Main(string[] args)
         {
+
             Console.OutputEncoding = System.Text.Encoding.UTF8;
 
             // 1️⃣ Crear base si no existe
@@ -28,6 +29,8 @@ namespace MiniCRM
             var cliente2 = new Cliente { Nombre = "Mariana Sassone", Email = "mariana@test.com", Telefono = "789012" };
             ConexionSQL.GuardarClienteEnSQL(cliente1);
             ConexionSQL.GuardarClienteEnSQL(cliente2);
+            ConexionSQL.CrearConversacion(1);
+            ConexionSQL.ListarConversaciones();
 
             // 3️⃣ Mostrar lo que hay en la base
             ConexionSQL.ListarClientesSQL();
@@ -53,6 +56,8 @@ namespace MiniCRM
                     case "4": ListarClientes(); break;
                     case "5": BuscarPorId(); break;
                     case "6": BuscarPorNombre(); break;
+                    case "7": AgregarMensaje(); break;
+                    case "8": VerMensajesDeConversacion(); break;
                     case "0":
                         Console.WriteLine("Saliendo... ¡Hasta luego!");
                         return;
@@ -103,7 +108,73 @@ namespace MiniCRM
             }
         }
 
+        static void AgregarMensaje()
+        {
+            Console.WriteLine("AGREGAR MENSAJE");
+            Console.WriteLine(new string('-', 16));
+
+            int conversacionId = PedirEntero("ID de la conversación: ");
+
+            Console.Write("Texto del mensaje: ");
+            string texto = (Console.ReadLine() ?? "").Trim();
+
+            if (string.IsNullOrWhiteSpace(texto))
+            {
+                Console.WriteLine("✗ El mensaje no puede estar vacío.");
+                return;
+            }
+
+            Mensaje nuevoMensaje = new Mensaje
+            {
+                ConversacionId = conversacionId,
+                Texto = texto,
+                Fecha = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+            };
+
+            try
+            {
+                ConexionSQL.GuardarMensajeEnSQL(nuevoMensaje);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("❌ Error al guardar mensaje: " + ex.Message);
+            }
+        }
+
+        static void VerMensajesDeConversacion()
+        {
+            Console.WriteLine("VER MENSAJES");
+            Console.WriteLine(new string('-', 12));
+
+            int conversacionId = PedirEntero("ID de la conversación: ");
+
+            try
+            {
+                var mensajes = ConexionSQL.ObtenerMensajesPorConversacion(conversacionId);
+
+                if (mensajes.Count == 0)
+                {
+                    Console.WriteLine("No hay mensajes para esta conversación.");
+                    return;
+                }
+
+                Console.WriteLine();
+                Console.WriteLine(new string('-', 45));
+                Console.WriteLine($"CONVERSACIÓN #{conversacionId}");
+                Console.WriteLine(new string('-', 45));
+
+                foreach (var mensaje in mensajes)
+                {
+                    Console.WriteLine($"{mensaje.Fecha} -> {mensaje.Texto}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("❌ Error al obtener mensajes: " + ex.Message);
+            }
+        }
         static void ListarClientes_SQL()
+
         {
             try
             {
@@ -128,6 +199,8 @@ namespace MiniCRM
             Console.WriteLine("4) Listar clientes");
             Console.WriteLine("5) Buscar por ID");
             Console.WriteLine("6) Buscar por Nombre");
+            Console.WriteLine("7) Agregar mensaje a conversación");
+            Console.WriteLine("8) Ver mensajes de una conversación");
             Console.WriteLine("0) Salir");
             Console.WriteLine();
         }

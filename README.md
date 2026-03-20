@@ -1,117 +1,113 @@
 ﻿MiniCRM (C# / .NET 8)
 
-Un gestor de clientes sencillo desarrollado en C# como práctica personal para aplicar conceptos de programación y buenas prácticas en el manejo de datos.
-El objetivo es simular funciones básicas de un CRM: alta, edición, baja, búsqueda y listado de clientes.
+Aplicación de consola desarrollada en C# para la gestión básica de clientes, conversaciones y mensajes, utilizando SQLite como base de datos.
 
-✨ Funcionalidades
+El proyecto simula funcionalidades simples de un CRM, trabajando con relaciones entre entidades y persistencia de datos.
 
-Agregar clientes con validación de:
+Funcionalidades
+Clientes
 
-Email en formato correcto.
+Alta de clientes con validaciones:
 
-Email único (comparación case-insensitive).
+Email con formato válido
 
-Teléfono opcional con normalización y validación (8–15 dígitos, admite “+”).
+Email único (case-insensitive)
 
-Modificar clientes:
+Teléfono opcional con normalización (8–15 dígitos, admite "+")
 
-Edición campo por campo.
+Modificación campo por campo (Enter mantiene valor)
 
-Enter → mantiene el valor actual.
+Eliminación con confirmación
 
-Validaciones aplicadas al nuevo valor.
+Búsqueda por ID
 
-Eliminar clientes con confirmación antes de borrar.
+Búsqueda por nombre (contains, sin distinción de mayúsculas)
 
-Buscar clientes:
+Listado en formato tabla
 
-Por ID exacto.
+Conversaciones
 
-Por nombre (búsqueda contains, case-insensitive).
+Creación de conversaciones asociadas a un cliente
 
-Listar clientes en tabla alineada (ID, Nombre, Email, Teléfono).
+Relación Cliente → Conversación
 
-Persistencia en JSON:
+Mensajes
 
-Los cambios se guardan automáticamente en clientes.json.
+Registro de mensajes dentro de una conversación
 
-Al iniciar el programa, se cargan los datos guardados.
+Relación Conversación → Mensajes
 
-🛠️ Tecnologías usadas
+Persistencia en SQLite
+
+Visualización de historial por conversación
+
+Tecnologías
 
 C# / .NET 8
 
+SQLite
+
 LINQ
 
-System.Text.Json (serialización y persistencia)
+System.Text.Json (uso previo para persistencia)
 
-Regex (validación de emails)
+Regex (validaciones)
 
-Git & GitHub (control de versiones)
+Git & GitHub
 
-📂 Ejecución
+Estructura
+
+Cliente → Conversación → Mensajes
+
+Cada entidad está vinculada mediante IDs.
+
+Ejecución
 
 Clonar el repositorio:
 
-git clone git clone https://github.com/Juan-P-E/MiniCRM8.git
-
-
+git clone https://github.com/Juan-P-E/MiniCRM8.git
 
 Entrar al directorio:
 
-cd MiniCRM
+cd MiniCRM8
 
-
-Ejecutar con .NET:
+Ejecutar:
 
 dotnet run
 
+La base de datos clientes.db se crea automáticamente.
 
-El archivo clientes.json se genera automáticamente en la carpeta bin/Debug/net8.0/.
-
-📸 Captura de ejemplo
+Ejemplo de uso
 MINICRM - GESTIÓN DE CLIENTES
-------------------------------
-1) Agregar cliente
-2) Modificar cliente
-3) Eliminar cliente
-4) Listar clientes
-5) Buscar por ID
-6) Buscar por Nombre
-0) Salir
 
+Agregar cliente
 
-Listado con datos cargados:
+Modificar cliente
 
-ID  NOMBRE       EMAIL                TELÉFONO
---  ----------   ------------------   --------------
-1   Juan Perez   juan@example.com     +5493329551497
-2   Maria Lopez  maria@test.com       
+Eliminar cliente
 
-🎯 Aprendizaje aplicado
+Listar clientes
 
-Este proyecto me sirvió para practicar:
+Buscar por ID
 
-Manejo de listas y colecciones en C#.
+Buscar por Nombre
 
-Validaciones de entrada y normalización de datos.
+Agregar mensaje a conversación
 
-Serialización/deserialización en JSON.
+Ver mensajes de una conversación
 
-Interacción con usuario en consola.
+Salir
 
-Organización de código en múltiples clases.
+Próximos pasos
 
-🚀 Próximos pasos
+Selección de conversación sin ingreso manual de ID
 
-Separar validaciones en una clase independiente (Validaciones.cs).
+Mejora del flujo de mensajes tipo chat
 
-Agregar exportación a CSV.
+Separación de validaciones en una clase independiente
 
-Preparar versión con interfaz gráfica (WinForms o MAUI) como evolución del proyecto.
+Versión con interfaz gráfica
 
-Repositorio creado como práctica de nivel trainee con orientación a CRM Dynamics 365 / Power Platform.  
-Este MiniCRM es la base para seguir aprendiendo y demostrar mi progreso en proyectos reales.
+Notas
 
-Actualización marzo 2026:
-Se agregó persistencia con SQLite y validación de email duplicado.
+Proyecto en evolución, enfocado en lógica de negocio y manejo de datos en aplicaciones tipo CRM.
