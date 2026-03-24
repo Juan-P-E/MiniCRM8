@@ -11,7 +11,46 @@ namespace MiniCRM
 {
     class Program
     {
-        // ====== Estado ======
+        static void ModoChat()
+        {
+            Console.WriteLine("MODO CHAT");
+            Console.WriteLine(new string('-', 12));
+
+            int conversacionId = SeleccionarConversacion();
+            if (conversacionId == -1) return;
+
+            while (true)
+            {
+                Console.Clear();
+
+                var mensajes = ConexionSQL.ObtenerMensajesPorConversacion(conversacionId);
+
+                Console.WriteLine($"CONVERSACIÓN #{conversacionId}");
+                Console.WriteLine(new string('-', 40));
+
+                foreach (var m in mensajes)
+                {
+                    Console.WriteLine($"{m.Fecha} -> {m.Texto}");
+                }
+
+                Console.WriteLine(new string('-', 40));
+                Console.WriteLine("Escribir mensaje (ENTER vacío para salir):");
+
+                string texto = (Console.ReadLine() ?? "").Trim();
+
+                if (string.IsNullOrWhiteSpace(texto))
+                    break;
+
+                Mensaje nuevo = new Mensaje
+                {
+                    ConversacionId = conversacionId,
+                    Texto = texto,
+                    Fecha = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+                };
+
+                ConexionSQL.GuardarMensajeEnSQL(nuevo);
+            }
+        }
         static List<Cliente> clientes = new();
         static readonly string rutaArchivo = Path.Combine(AppContext.BaseDirectory, "clientes.json");
 
@@ -29,11 +68,11 @@ namespace MiniCRM
             var cliente2 = new Cliente { Nombre = "Mariana Sassone", Email = "mariana@test.com", Telefono = "789012" };
             ConexionSQL.GuardarClienteEnSQL(cliente1);
             ConexionSQL.GuardarClienteEnSQL(cliente2);
-            ConexionSQL.CrearConversacion(1);
-            ConexionSQL.ListarConversaciones();
+            //ConexionSQL.CrearConversacion(1);
+            //ConexionSQL.ListarConversaciones();
 
             // 3️⃣ Mostrar lo que hay en la base
-            ConexionSQL.ListarClientesSQL();
+            //ConexionSQL.ListarClientesSQL();
 
             Console.WriteLine("\n↩️  Enter para ir al menú…");
             Console.ReadLine();
@@ -58,6 +97,8 @@ namespace MiniCRM
                     case "6": BuscarPorNombre(); break;
                     case "7": AgregarMensaje(); break;
                     case "8": VerMensajesDeConversacion(); break;
+                    case "9": ModoChat(); break;
+                    case "10": CrearConversacionManual(); break;
                     case "0":
                         Console.WriteLine("Saliendo... ¡Hasta luego!");
                         return;
@@ -108,6 +149,26 @@ namespace MiniCRM
             }
         }
 
+        static void CrearConversacionManual()
+        {
+            Console.WriteLine("CREAR CONVERSACIÓN");
+            Console.WriteLine(new string('-', 20));
+
+            // mostrar clientes primero
+            ConexionSQL.ListarClientesSQL();
+
+            int clienteId = PedirEntero("ID del cliente: ");
+
+            try
+            {
+                ConexionSQL.CrearConversacion(clienteId);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error al crear conversación: " + ex.Message);
+            }
+        }
+
         static void AgregarMensaje()
         {
             Console.WriteLine("AGREGAR MENSAJE");
@@ -146,31 +207,19 @@ namespace MiniCRM
             Console.WriteLine("VER MENSAJES");
             Console.WriteLine(new string('-', 12));
 
-            int conversacionId = PedirEntero("ID de la conversación: ");
+            int conversacionId = SeleccionarConversacion();
+            if (conversacionId == -1) return;
 
-            try
+            var mensajes = ConexionSQL.ObtenerMensajesPorConversacion(conversacionId);
+
+            Console.WriteLine();
+            Console.WriteLine(new string('-', 45));
+            Console.WriteLine($"CONVERSACIÓN #{conversacionId}");
+            Console.WriteLine(new string('-', 45));
+
+            foreach (var m in mensajes)
             {
-                var mensajes = ConexionSQL.ObtenerMensajesPorConversacion(conversacionId);
-
-                if (mensajes.Count == 0)
-                {
-                    Console.WriteLine("No hay mensajes para esta conversación.");
-                    return;
-                }
-
-                Console.WriteLine();
-                Console.WriteLine(new string('-', 45));
-                Console.WriteLine($"CONVERSACIÓN #{conversacionId}");
-                Console.WriteLine(new string('-', 45));
-
-                foreach (var mensaje in mensajes)
-                {
-                    Console.WriteLine($"{mensaje.Fecha} -> {mensaje.Texto}");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("❌ Error al obtener mensajes: " + ex.Message);
+                Console.WriteLine($"{m.Fecha} -> {m.Texto}");
             }
         }
         static void ListarClientes_SQL()
@@ -201,6 +250,8 @@ namespace MiniCRM
             Console.WriteLine("6) Buscar por Nombre");
             Console.WriteLine("7) Agregar mensaje a conversación");
             Console.WriteLine("8) Ver mensajes de una conversación");
+            Console.WriteLine("9) Modo chat");
+            Console.WriteLine("10) Crear conversación");
             Console.WriteLine("0) Salir");
             Console.WriteLine();
         }
@@ -371,6 +422,49 @@ namespace MiniCRM
             {
                 Console.WriteLine("No se realizaron cambios.");
             }
+        }
+
+        static int SeleccionarConversacion()
+        {
+            Console.WriteLine("CONVERSACIONES DISPONIBLES");
+            Console.WriteLine(new string('-', 35));
+
+            using var conn = new System.Data.SQLite.SQLiteConnection("Data Source=clientes.db;Version=3;");
+            conn.Open();
+
+            string sql = "SELECT Id, ClienteId, Fecha FROM Conversaciones ORDER BY Id";
+
+            using var cmd = new System.Data.SQLite.SQLiteCommand(sql, conn);
+            using var rd = cmd.ExecuteReader();
+
+            List<int> ids = new List<int>();
+
+            while (rd.Read())
+            {
+                int id = rd.GetInt32(0);
+                int clienteId = rd.GetInt32(1);
+                string fecha = rd.GetString(2);
+
+                Console.WriteLine($"{id}) Cliente {clienteId} - {fecha}");
+                ids.Add(id);
+            }
+
+            if (ids.Count == 0)
+            {
+                Console.WriteLine("No hay conversaciones.");
+                return -1;
+            }
+
+            Console.Write("\nElegir ID: ");
+            int elegido;
+
+            if (!int.TryParse(Console.ReadLine(), out elegido) || !ids.Contains(elegido))
+            {
+                Console.WriteLine("ID inválido.");
+                return -1;
+            }
+
+            return elegido;
         }
 
         static void EliminarCliente()
