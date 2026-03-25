@@ -11,6 +11,31 @@ namespace MiniCRM
 {
     class Program
     {
+        static void CrearConversacionManual()
+        {
+            Console.WriteLine("CREAR CONVERSACIÓN");
+            Console.WriteLine(new string('-', 20));
+
+            ConexionSQL.ListarClientesSQL();
+
+            int clienteId = PedirEntero("ID del cliente: ");
+
+            if (!ConexionSQL.ExisteClientePorId(clienteId))
+            {
+                Console.WriteLine("No existe un cliente con ese ID.");
+                return;
+            }
+
+            try
+            {
+                ConexionSQL.CrearConversacion(clienteId);
+                Console.WriteLine("Conversación creada correctamente.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error al crear conversación: " + ex.Message);
+            }
+        }
         static void ModoChat()
         {
             Console.WriteLine("MODO CHAT");
@@ -64,10 +89,10 @@ namespace MiniCRM
             ConexionSQL.ProbarConexion();
 
             // 2️⃣ Insertar 2 registros de prueba (solo una vez)
-            var cliente1 = new Cliente { Nombre = "Juan Test", Email = "juan@test.com", Telefono = "123456" };
-            var cliente2 = new Cliente { Nombre = "Mariana Sassone", Email = "mariana@test.com", Telefono = "789012" };
-            ConexionSQL.GuardarClienteEnSQL(cliente1);
-            ConexionSQL.GuardarClienteEnSQL(cliente2);
+            //var cliente1 = new Cliente { Nombre = "Juan Test", Email = "juan@test.com", Telefono = "123456" };
+            //var cliente2 = new Cliente { Nombre = "Mariana Sassone", Email = "mariana@test.com", Telefono = "789012" };
+            //ConexionSQL.GuardarClienteEnSQL(cliente1);
+           // ConexionSQL.GuardarClienteEnSQL(cliente2);
             //ConexionSQL.CrearConversacion(1);
             //ConexionSQL.ListarConversaciones();
 
@@ -146,26 +171,6 @@ namespace MiniCRM
             catch (Exception ex)
             {
                 Console.WriteLine("❌ Error al guardar en SQLite: " + ex.Message);
-            }
-        }
-
-        static void CrearConversacionManual()
-        {
-            Console.WriteLine("CREAR CONVERSACIÓN");
-            Console.WriteLine(new string('-', 20));
-
-            // mostrar clientes primero
-            ConexionSQL.ListarClientesSQL();
-
-            int clienteId = PedirEntero("ID del cliente: ");
-
-            try
-            {
-                ConexionSQL.CrearConversacion(clienteId);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error al crear conversación: " + ex.Message);
             }
         }
 
@@ -425,48 +430,34 @@ namespace MiniCRM
         }
 
         static int SeleccionarConversacion()
-        {
-            Console.WriteLine("CONVERSACIONES DISPONIBLES");
-            Console.WriteLine(new string('-', 35));
+{
+    Console.WriteLine("CONVERSACIONES DISPONIBLES");
+    Console.WriteLine(new string('-', 40));
 
-            using var conn = new System.Data.SQLite.SQLiteConnection("Data Source=clientes.db;Version=3;");
-            conn.Open();
+    var conversaciones = ConexionSQL.ObtenerConversaciones();
 
-            string sql = "SELECT Id, ClienteId, Fecha FROM Conversaciones ORDER BY Id";
+    if (conversaciones.Count == 0)
+    {
+        Console.WriteLine("No hay conversaciones.");
+        return -1;
+    }
 
-            using var cmd = new System.Data.SQLite.SQLiteCommand(sql, conn);
-            using var rd = cmd.ExecuteReader();
+    foreach (var c in conversaciones)
+    {
+        Console.WriteLine($"{c.Id}) {c.NombreCliente} - {c.Fecha}");
+    }
 
-            List<int> ids = new List<int>();
+    int elegida = PedirEntero("\nElegir ID: ");
 
-            while (rd.Read())
-            {
-                int id = rd.GetInt32(0);
-                int clienteId = rd.GetInt32(1);
-                string fecha = rd.GetString(2);
+    bool existe = conversaciones.Any(c => c.Id == elegida);
+    if (!existe)
+    {
+        Console.WriteLine("ID inválido.");
+        return -1;
+    }
 
-                Console.WriteLine($"{id}) Cliente {clienteId} - {fecha}");
-                ids.Add(id);
-            }
-
-            if (ids.Count == 0)
-            {
-                Console.WriteLine("No hay conversaciones.");
-                return -1;
-            }
-
-            Console.Write("\nElegir ID: ");
-            int elegido;
-
-            if (!int.TryParse(Console.ReadLine(), out elegido) || !ids.Contains(elegido))
-            {
-                Console.WriteLine("ID inválido.");
-                return -1;
-            }
-
-            return elegido;
-        }
-
+    return elegida;
+}
         static void EliminarCliente()
         {
             Console.WriteLine("ELIMINAR CLIENTE");

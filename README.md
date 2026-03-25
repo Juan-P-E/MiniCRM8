@@ -49,3 +49,12 @@ Clonar el repositorio:
 
 ```bash
 git clone https://github.com/Juan-P-E/MiniCRM8.git
+
+
+ Ultima actualizacion: Estado actual del proyecto
+
+El sistema permite gestionar clientes, conversaciones y mensajes utilizando SQLite como base de datos, incluyendo un modo chat desde consola.
+
+Próxima evolución
+
+Migración a API REST con ASP.NET Core para desacoplar la lógica y permitir integración con frontend o servicios externos.
